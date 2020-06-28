@@ -13,9 +13,10 @@ const numRows = 25;
 const numCols = 15;
 
 function Grid() {
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	const [snakeLength, setSnakeLength] = useState(3);
 	const [tail, setTail] = useState<Position[]>([]);
-	const [currentPos, setCurrentPos] = useState<Position>({ x: 7, y: 12 });
+	// const [currentPos, setCurrentPos] = useState<Position>({ x: 7, y: 12 });
 	const [yPos, setYPos] = useState(12);
 	const [xPos, setXPos] = useState(7);
 	const [count, setCount] = useState(0);
