@@ -27,7 +27,7 @@ function Grid() {
 	});
 
 	const gameOver = () => {
-		return <h1>Game Over you fucking goon</h1>;
+		return <h1>Game Over</h1>;
 	};
 
 	const runSnake = () => {
@@ -36,6 +36,7 @@ function Grid() {
 				case "up":
 					const up = produce(grid, (gridCopy) => {
 						gridCopy[yPos - 1][xPos] = 1;
+						gridCopy[yPos][xPos] = 0;
 					});
 					setYPos(yPos - 1);
 					setGrid(up);
@@ -44,6 +45,7 @@ function Grid() {
 					setGrid(
 						produce(grid, (gridCopy) => {
 							gridCopy[yPos + 1][xPos] = 1;
+							gridCopy[yPos][xPos] = 0;
 						})
 					);
 					setYPos(yPos + 1);
@@ -53,6 +55,7 @@ function Grid() {
 					setGrid(
 						produce(grid, (gridCopy) => {
 							gridCopy[yPos][xPos - 1] = 1;
+							gridCopy[yPos][xPos] = 0;
 						})
 					);
 					setXPos(xPos - 1);
@@ -62,6 +65,7 @@ function Grid() {
 					setGrid(
 						produce(grid, (gridCopy) => {
 							gridCopy[yPos][xPos + 1] = 1;
+							gridCopy[yPos][xPos] = 0;
 						})
 					);
 					setXPos(xPos + 1);
