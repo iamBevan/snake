@@ -3,12 +3,19 @@ import styles from "./Grid.module.scss";
 import produce from "immer";
 import { useInterval, useBoolean } from "react-use";
 
+interface Position {
+	x: number;
+	y: number;
+}
+
+type Direction = "left" | "right" | "up" | "down";
 const numRows = 25;
 const numCols = 15;
 
-type Direction = "left" | "right" | "up" | "down";
-
 function Grid() {
+	const [snakeLength, setSnakeLength] = useState(3);
+	const [tail, setTail] = useState<Position[]>([]);
+	const [currentPos, setCurrentPos] = useState<Position>({ x: 7, y: 12 });
 	const [yPos, setYPos] = useState(12);
 	const [xPos, setXPos] = useState(7);
 	const [count, setCount] = useState(0);
@@ -36,7 +43,9 @@ function Grid() {
 				case "up":
 					const up = produce(grid, (gridCopy) => {
 						gridCopy[yPos - 1][xPos] = 1;
-						gridCopy[yPos][xPos] = 0;
+						if (tail[0]) {
+							gridCopy[tail[0]?.y][tail[0]?.x] = 0;
+						}
 					});
 					setYPos(yPos - 1);
 					setGrid(up);
@@ -45,7 +54,9 @@ function Grid() {
 					setGrid(
 						produce(grid, (gridCopy) => {
 							gridCopy[yPos + 1][xPos] = 1;
-							gridCopy[yPos][xPos] = 0;
+							if (tail[0]) {
+								gridCopy[tail[0]?.y][tail[0]?.x] = 0;
+							}
 						})
 					);
 					setYPos(yPos + 1);
@@ -55,7 +66,9 @@ function Grid() {
 					setGrid(
 						produce(grid, (gridCopy) => {
 							gridCopy[yPos][xPos - 1] = 1;
-							gridCopy[yPos][xPos] = 0;
+							if (tail[0]) {
+								gridCopy[tail[0]?.y][tail[0]?.x] = 0;
+							}
 						})
 					);
 					setXPos(xPos - 1);
@@ -65,12 +78,22 @@ function Grid() {
 					setGrid(
 						produce(grid, (gridCopy) => {
 							gridCopy[yPos][xPos + 1] = 1;
-							gridCopy[yPos][xPos] = 0;
+							if (tail[0]) {
+								gridCopy[tail[0]?.y][tail[0]?.x] = 0;
+							}
 						})
 					);
 					setXPos(xPos + 1);
 
 					break;
+			}
+			if (tail?.length === snakeLength) {
+				let position = { x: xPos, y: yPos };
+				let newPosition = [...tail, position];
+				newPosition.shift();
+				setTail(newPosition);
+			} else {
+				tail.push({ x: xPos, y: yPos });
 			}
 		} else {
 			toggleIsRunning(false);
@@ -82,6 +105,7 @@ function Grid() {
 		() => {
 			runSnake();
 			setCount(count + 1);
+			console.log(tail);
 		},
 		isRunning ? delay : null
 	);
