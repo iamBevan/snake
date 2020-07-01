@@ -22,6 +22,8 @@ function Grid() {
 	const [count, setCount] = useState(0);
 	const [delay, setDelay] = useState(500);
 	const [isRunning, toggleIsRunning] = useBoolean(true);
+	const [foodCoords, setFoodCoords] = useState<Position>({ x: 1, y: 1 });
+	const [hasFood, setHasFood] = useState(false);
 
 	const [direction, setDirection] = useState<Direction>("up");
 
@@ -38,20 +40,37 @@ function Grid() {
 		return <h1>Game Over</h1>;
 	};
 
-	// const reDrawGrid = ({x}) => {
-	// 	setGrid(
-	// 		produce(grid, (gridCopy) => {
-	// 			gridCopy[yPos + 1][xPos] = 1;
-	// 			if (tail[0]) {
-	// 				gridCopy[tail[0]?.y][tail[0]?.x] = 0;
-	// 			}
-	// 		})
-	// 	);
-	// }
+	const food = () => {
+		setFoodCoords({
+			x: Math.floor(Math.random() * (numCols - 1 - 0 + 1)) + 0,
+			y: Math.floor(Math.random() * (numRows - 1 - 0 + 1)) + 0,
+		});
+		setHasFood(true);
+	};
 
-	// const food = () => {};
+	const handleColor = (squareVal: number) => {
+		if (squareVal === 0) {
+			return "black";
+		}
+		if (squareVal === 1) {
+			return "white";
+		}
+		if (squareVal === 2) {
+			return "red";
+		}
+	};
 
 	const runSnake = () => {
+		const isThereFood = () => {
+			if (hasFood === false) {
+				setGrid(
+					produce(grid, (gridCopy) => {
+						gridCopy[foodCoords.x][foodCoords.y] = 2;
+					})
+				);
+				setHasFood(true);
+			}
+		};
 		switch (direction) {
 			case "up":
 				setGrid(
@@ -62,6 +81,7 @@ function Grid() {
 						}
 					})
 				);
+				isThereFood();
 				setYPos(yPos - 1);
 				break;
 			case "down":
@@ -73,6 +93,7 @@ function Grid() {
 						}
 					})
 				);
+				isThereFood();
 				setYPos(yPos + 1);
 				break;
 			case "left":
@@ -84,6 +105,7 @@ function Grid() {
 						}
 					})
 				);
+				isThereFood();
 				setXPos(xPos - 1);
 				break;
 			case "right":
@@ -95,6 +117,7 @@ function Grid() {
 						}
 					})
 				);
+				isThereFood();
 				setXPos(xPos + 1);
 				break;
 		}
@@ -110,6 +133,9 @@ function Grid() {
 
 	useInterval(
 		() => {
+			if (hasFood === false) {
+				food();
+			}
 			if (
 				(yPos === 0 && direction === "up") ||
 				(xPos === 0 && direction === "left") ||
@@ -176,7 +202,7 @@ function Grid() {
 								style={{
 									width: 25,
 									height: 25,
-									backgroundColor: grid[i][k] ? "white" : "black",
+									backgroundColor: handleColor(grid[i][k]),
 									border: "1px solid #f1faee",
 								}}
 							/>
