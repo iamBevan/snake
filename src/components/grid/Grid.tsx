@@ -38,82 +38,97 @@ function Grid() {
 		return <h1>Game Over</h1>;
 	};
 
+	// const reDrawGrid = ({x}) => {
+	// 	setGrid(
+	// 		produce(grid, (gridCopy) => {
+	// 			gridCopy[yPos + 1][xPos] = 1;
+	// 			if (tail[0]) {
+	// 				gridCopy[tail[0]?.y][tail[0]?.x] = 0;
+	// 			}
+	// 		})
+	// 	);
+	// }
+
+	const food = () => {};
+
 	const runSnake = () => {
-		if (yPos > 0 && yPos < numRows - 1 && xPos > 0 && xPos < numCols - 1) {
-			switch (direction) {
-				case "up":
-					const up = produce(grid, (gridCopy) => {
+		switch (direction) {
+			case "up":
+				setGrid(
+					produce(grid, (gridCopy) => {
 						gridCopy[yPos - 1][xPos] = 1;
 						if (tail[0]) {
 							gridCopy[tail[0]?.y][tail[0]?.x] = 0;
 						}
-					});
-					setYPos(yPos - 1);
-					setGrid(up);
-					break;
-				case "down":
-					setGrid(
-						produce(grid, (gridCopy) => {
-							gridCopy[yPos + 1][xPos] = 1;
-							if (tail[0]) {
-								gridCopy[tail[0]?.y][tail[0]?.x] = 0;
-							}
-						})
-					);
-					setYPos(yPos + 1);
-
-					break;
-				case "left":
-					setGrid(
-						produce(grid, (gridCopy) => {
-							gridCopy[yPos][xPos - 1] = 1;
-							if (tail[0]) {
-								gridCopy[tail[0]?.y][tail[0]?.x] = 0;
-							}
-						})
-					);
-					setXPos(xPos - 1);
-
-					break;
-				case "right":
-					setGrid(
-						produce(grid, (gridCopy) => {
-							gridCopy[yPos][xPos + 1] = 1;
-							if (tail[0]) {
-								gridCopy[tail[0]?.y][tail[0]?.x] = 0;
-							}
-						})
-					);
-					setXPos(xPos + 1);
-
-					break;
-			}
-			if (tail?.length === snakeLength) {
-				let position = { x: xPos, y: yPos };
-				let newPosition = [...tail, position];
-				newPosition.shift();
-				setTail(newPosition);
-			} else {
-				tail.push({ x: xPos, y: yPos });
-			}
+					})
+				);
+				setYPos(yPos - 1);
+				break;
+			case "down":
+				setGrid(
+					produce(grid, (gridCopy) => {
+						gridCopy[yPos + 1][xPos] = 1;
+						if (tail[0]) {
+							gridCopy[tail[0]?.y][tail[0]?.x] = 0;
+						}
+					})
+				);
+				setYPos(yPos + 1);
+				break;
+			case "left":
+				setGrid(
+					produce(grid, (gridCopy) => {
+						gridCopy[yPos][xPos - 1] = 1;
+						if (tail[0]) {
+							gridCopy[tail[0]?.y][tail[0]?.x] = 0;
+						}
+					})
+				);
+				setXPos(xPos - 1);
+				break;
+			case "right":
+				setGrid(
+					produce(grid, (gridCopy) => {
+						gridCopy[yPos][xPos + 1] = 1;
+						if (tail[0]) {
+							gridCopy[tail[0]?.y][tail[0]?.x] = 0;
+						}
+					})
+				);
+				setXPos(xPos + 1);
+				break;
+		}
+		if (tail?.length === snakeLength) {
+			let position = { x: xPos, y: yPos };
+			let newPosition = [...tail, position];
+			newPosition.shift();
+			setTail(newPosition);
 		} else {
-			toggleIsRunning(false);
-			console.log("else");
+			tail.push({ x: xPos, y: yPos });
 		}
 	};
 
 	useInterval(
 		() => {
-			runSnake();
-			setCount(count + 1);
-			console.log(tail);
+			if (
+				(yPos === 0 && direction === "up") ||
+				(xPos === 0 && direction === "left") ||
+				(yPos === numRows - 1 && direction === "down") ||
+				(xPos === numCols - 1 && direction === "right")
+			) {
+				toggleIsRunning(false);
+			} else {
+				runSnake();
+				setCount(count + 1);
+				console.log("interval log", xPos, yPos);
+			}
 		},
 		isRunning ? delay : null
 	);
 
 	// console.log(grid);
-	console.log("yPos", yPos);
-	console.log("xPos", xPos);
+	// console.log("yPos", yPos);
+	// console.log("xPos", xPos);
 
 	const handleKeyPress = useCallback((e: KeyboardEvent) => {
 		e.preventDefault();
@@ -161,8 +176,8 @@ function Grid() {
 								style={{
 									width: 25,
 									height: 25,
-									backgroundColor: grid[i][k] ? "red" : "lightblue",
-									border: "1px solid grey",
+									backgroundColor: grid[i][k] ? "white" : "black",
+									border: "1px solid #f1faee",
 								}}
 							/>
 						))
