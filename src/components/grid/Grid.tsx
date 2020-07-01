@@ -49,7 +49,7 @@ function Grid() {
 	// 	);
 	// }
 
-	const food = () => {};
+	// const food = () => {};
 
 	const runSnake = () => {
 		switch (direction) {
