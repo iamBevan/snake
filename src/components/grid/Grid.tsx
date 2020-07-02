@@ -20,7 +20,7 @@ function Grid() {
 	const [yPos, setYPos] = useState(12);
 	const [xPos, setXPos] = useState(7);
 	const [count, setCount] = useState(0);
-	const [delay, setDelay] = useState(500);
+	const [delay, setDelay] = useState(2000);
 	const [isRunning, toggleIsRunning] = useBoolean(true);
 	const [foodCoords, setFoodCoords] = useState<Position>({
 		x: Math.floor(Math.random() * 14) + 1,
@@ -38,6 +38,14 @@ function Grid() {
 
 		return rows;
 	});
+
+	// useEffect(() => {
+	// 	setGrid(
+	// 		produce(grid, (gridCopy) => {
+	// 			gridCopy[xPos][yPos] = 1;
+	// 		})
+	// 	);;
+	// }, [xPos]);
 
 	const gameOver = () => {
 		return <h1>Game Over</h1>;
@@ -70,96 +78,97 @@ function Grid() {
 				setGrid(
 					produce(grid, (gridCopy) => {
 						gridCopy[foodCoords.y][foodCoords.x] = 2;
-						gridCopy[yPos - 1][xPos] = 1;
+						// gridCopy[yPos - 1][xPos] = 1;
 					})
 				);
 				setHasFood(true);
 			}
 		};
-		switch (direction) {
-			case "up":
-				setGrid(
-					produce(grid, (gridCopy) => {
-						gridCopy[yPos - 1][xPos] = 1;
-						if (tail[0]) {
-							gridCopy[tail[0]?.y][tail[0]?.x] = 0;
-						}
-					})
-				);
-				isThereFood();
-				setYPos(yPos - 1);
-				break;
-			case "down":
-				setGrid(
-					produce(grid, (gridCopy) => {
-						gridCopy[yPos + 1][xPos] = 1;
-						if (tail[0]) {
-							gridCopy[tail[0]?.y][tail[0]?.x] = 0;
-						}
-					})
-				);
-				isThereFood();
-				setYPos(yPos + 1);
-				break;
-			case "left":
-				setGrid(
-					produce(grid, (gridCopy) => {
-						gridCopy[yPos][xPos - 1] = 1;
-						if (tail[0]) {
-							gridCopy[tail[0]?.y][tail[0]?.x] = 0;
-						}
-					})
-				);
-				isThereFood();
-				setXPos(xPos - 1);
-				break;
-			case "right":
-				setGrid(
-					produce(grid, (gridCopy) => {
-						gridCopy[yPos][xPos + 1] = 1;
-						if (tail[0]) {
-							gridCopy[tail[0]?.y][tail[0]?.x] = 0;
-						}
-					})
-				);
-				isThereFood();
-				setXPos(xPos + 1);
-				break;
-		}
-		if (tail?.length === snakeLength) {
-			let position = { x: xPos, y: yPos };
-			let newPosition = [...tail, position];
-			newPosition.shift();
-			setTail(newPosition);
+		if (
+			(yPos === 0 && direction === "up") ||
+			(xPos === 0 && direction === "left") ||
+			(yPos === numRows - 1 && direction === "down") ||
+			(xPos === numCols - 1 && direction === "right")
+		) {
+			toggleIsRunning(false);
 		} else {
-			tail.push({ x: xPos, y: yPos });
+			switch (direction) {
+				case "up":
+					setGrid(
+						produce(grid, (gridCopy) => {
+							gridCopy[yPos - 1][xPos] = 1;
+							if (tail[0]) {
+								gridCopy[tail[0]?.y][tail[0]?.x] = 0;
+							}
+						})
+					);
+					isThereFood();
+					setYPos(yPos - 1);
+					break;
+				case "down":
+					setGrid(
+						produce(grid, (gridCopy) => {
+							gridCopy[yPos + 1][xPos] = 1;
+							if (tail[0]) {
+								gridCopy[tail[0]?.y][tail[0]?.x] = 0;
+							}
+						})
+					);
+					isThereFood();
+					setYPos(yPos + 1);
+					break;
+				case "left":
+					setGrid(
+						produce(grid, (gridCopy) => {
+							gridCopy[yPos][xPos - 1] = 1;
+							if (tail[0]) {
+								gridCopy[tail[0]?.y][tail[0]?.x] = 0;
+							}
+						})
+					);
+					isThereFood();
+					setXPos(xPos - 1);
+					break;
+				case "right":
+					setGrid(
+						produce(grid, (gridCopy) => {
+							gridCopy[yPos][xPos + 1] = 1;
+							if (tail[0]) {
+								gridCopy[tail[0]?.y][tail[0]?.x] = 0;
+							}
+						})
+					);
+					isThereFood();
+					setXPos(xPos + 1);
+					break;
+			}
+			if (tail?.length === snakeLength) {
+				let position = { x: xPos, y: yPos };
+				let newPosition = [...tail, position];
+				newPosition.shift();
+				setTail(newPosition);
+			} else {
+				tail.push({ x: xPos, y: yPos });
+			}
 		}
-
-		if (xPos === foodCoords.x && yPos === foodCoords.y) {
-			setSnakeLength((prev) => prev + 1);
-			setHasFood(false);
-			console.log("DING DING");
-			food();
-		}
+		console.log(grid);
 	};
 
 	useInterval(
 		() => {
-			if (
-				(yPos === 0 && direction === "up") ||
-				(xPos === 0 && direction === "left") ||
-				(yPos === numRows - 1 && direction === "down") ||
-				(xPos === numCols - 1 && direction === "right")
-			) {
-				toggleIsRunning(false);
-			} else {
-				runSnake();
-				setCount(count + 1);
-				console.log("interval log", "x: ", xPos, "y: ", yPos);
-				console.log("food log", "x: ", foodCoords?.x, "y: ", foodCoords?.y);
+			runSnake();
+			setCount(count + 1);
+			if (xPos === foodCoords.x && yPos === foodCoords.y) {
+				// setSnakeLength((prev) => prev + 1);
+				setHasFood(false);
+				console.log("DING DING");
+				food();
 			}
-			console.log("hasfood", hasFood);
-			console.log(grid);
+
+			// console.log("interval log", "x: ", xPos, "y: ", yPos);
+			// console.log("food log", "x: ", foodCoords?.x, "y: ", foodCoords?.y);
+
+			// console.log("hasfood", hasFood);
 		},
 		isRunning ? delay : null
 	);
@@ -198,7 +207,7 @@ function Grid() {
 
 	return (
 		<>
-			{isRunning ? undefined : gameOver()}
+			{isRunning ? <h1>Snake</h1> : gameOver()}
 			<div className={styles.container}>
 				<div
 					className={styles.grid}
