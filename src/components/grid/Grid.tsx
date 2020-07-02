@@ -14,7 +14,7 @@ const numCols = 15;
 
 function Grid() {
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	const [snakeLength, setSnakeLength] = useState(3);
+	const [snakeLength, setSnakeLength] = useState(5);
 	const [tail, setTail] = useState<Position[]>([]);
 	// const [currentPos, setCurrentPos] = useState<Position>({ x: 7, y: 12 });
 	const [yPos, setYPos] = useState(12);
@@ -22,7 +22,10 @@ function Grid() {
 	const [count, setCount] = useState(0);
 	const [delay, setDelay] = useState(500);
 	const [isRunning, toggleIsRunning] = useBoolean(true);
-	const [foodCoords, setFoodCoords] = useState<Position>({ x: 1, y: 1 });
+	const [foodCoords, setFoodCoords] = useState<Position>({
+		x: Math.floor(Math.random() * 14) + 1,
+		y: Math.floor(Math.random() * 24) + 1,
+	});
 	const [hasFood, setHasFood] = useState(false);
 
 	const [direction, setDirection] = useState<Direction>("up");
@@ -42,10 +45,11 @@ function Grid() {
 
 	const food = () => {
 		setFoodCoords({
-			x: Math.floor(Math.random() * (numCols - 1 - 0 + 1)) + 0,
-			y: Math.floor(Math.random() * (numRows - 1 - 0 + 1)) + 0,
+			x: Math.floor(Math.random() * 14) + 1,
+			y: Math.floor(Math.random() * 24) + 1,
 		});
-		setHasFood(true);
+		// setHasFood(true);
+		console.log("food");
 	};
 
 	const handleColor = (squareVal: number) => {
@@ -65,7 +69,8 @@ function Grid() {
 			if (hasFood === false) {
 				setGrid(
 					produce(grid, (gridCopy) => {
-						gridCopy[foodCoords.x][foodCoords.y] = 2;
+						gridCopy[foodCoords.y][foodCoords.x] = 2;
+						gridCopy[yPos - 1][xPos] = 1;
 					})
 				);
 				setHasFood(true);
@@ -129,13 +134,17 @@ function Grid() {
 		} else {
 			tail.push({ x: xPos, y: yPos });
 		}
+
+		if (xPos === foodCoords.x && yPos === foodCoords.y) {
+			setSnakeLength((prev) => prev + 1);
+			setHasFood(false);
+			console.log("DING DING");
+			food();
+		}
 	};
 
 	useInterval(
 		() => {
-			if (hasFood === false) {
-				food();
-			}
 			if (
 				(yPos === 0 && direction === "up") ||
 				(xPos === 0 && direction === "left") ||
@@ -146,13 +155,15 @@ function Grid() {
 			} else {
 				runSnake();
 				setCount(count + 1);
-				console.log("interval log", xPos, yPos);
+				console.log("interval log", "x: ", xPos, "y: ", yPos);
+				console.log("food log", "x: ", foodCoords?.x, "y: ", foodCoords?.y);
 			}
+			console.log("hasfood", hasFood);
+			console.log(grid);
 		},
 		isRunning ? delay : null
 	);
 
-	// console.log(grid);
 	// console.log("yPos", yPos);
 	// console.log("xPos", xPos);
 
