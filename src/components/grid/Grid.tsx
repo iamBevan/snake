@@ -20,7 +20,7 @@ function Grid() {
 	const [yPos, setYPos] = useState(12);
 	const [xPos, setXPos] = useState(7);
 	const [count, setCount] = useState(0);
-	const [delay, setDelay] = useState(2000);
+	const [delay, setDelay] = useState(200);
 	const [isRunning, toggleIsRunning] = useBoolean(true);
 	const [foodCoords, setFoodCoords] = useState<Position>({
 		x: Math.floor(Math.random() * 14) + 1,
@@ -39,25 +39,42 @@ function Grid() {
 		return rows;
 	});
 
-	// useEffect(() => {
-	// 	setGrid(
-	// 		produce(grid, (gridCopy) => {
-	// 			gridCopy[xPos][yPos] = 1;
-	// 		})
-	// 	);;
-	// }, [xPos]);
+	useEffect(() => {
+		const isThereFood = () => {
+			if (hasFood === false) {
+				setGrid(
+					produce(grid, (gridCopy) => {
+						gridCopy[foodCoords.y][foodCoords.x] = 2;
+					})
+				);
+				// setXPos(foodCoords.x);
+				// setYPos(foodCoords.y);
+				setHasFood(true);
+			}
+		};
+
+		if (foodCoords.x === xPos && foodCoords.y === yPos) {
+			setHasFood(false);
+			setSnakeLength((prev) => prev + 1);
+			const food = () => {
+				setFoodCoords({
+					x: Math.floor(Math.random() * 14) + 1,
+					y: Math.floor(Math.random() * 24) + 1,
+				});
+				// setHasFood(true);
+				console.log("food");
+			};
+			food();
+		}
+
+		isThereFood();
+		if (count > 0) {
+			console.log("grid", grid);
+		}
+	}, [grid, xPos, yPos]);
 
 	const gameOver = () => {
 		return <h1>Game Over</h1>;
-	};
-
-	const food = () => {
-		setFoodCoords({
-			x: Math.floor(Math.random() * 14) + 1,
-			y: Math.floor(Math.random() * 24) + 1,
-		});
-		// setHasFood(true);
-		console.log("food");
 	};
 
 	const handleColor = (squareVal: number) => {
@@ -73,17 +90,6 @@ function Grid() {
 	};
 
 	const runSnake = () => {
-		const isThereFood = () => {
-			if (hasFood === false) {
-				setGrid(
-					produce(grid, (gridCopy) => {
-						gridCopy[foodCoords.y][foodCoords.x] = 2;
-						// gridCopy[yPos - 1][xPos] = 1;
-					})
-				);
-				setHasFood(true);
-			}
-		};
 		if (
 			(yPos === 0 && direction === "up") ||
 			(xPos === 0 && direction === "left") ||
@@ -102,8 +108,9 @@ function Grid() {
 							}
 						})
 					);
-					isThereFood();
-					setYPos(yPos - 1);
+					// setYPos
+					// isThereFood();
+					setYPos((prev) => prev - 1);
 					break;
 				case "down":
 					setGrid(
@@ -114,7 +121,7 @@ function Grid() {
 							}
 						})
 					);
-					isThereFood();
+					// isThereFood();
 					setYPos(yPos + 1);
 					break;
 				case "left":
@@ -126,7 +133,7 @@ function Grid() {
 							}
 						})
 					);
-					isThereFood();
+					// isThereFood();
 					setXPos(xPos - 1);
 					break;
 				case "right":
@@ -138,7 +145,7 @@ function Grid() {
 							}
 						})
 					);
-					isThereFood();
+					// isThereFood();
 					setXPos(xPos + 1);
 					break;
 			}
@@ -150,31 +157,18 @@ function Grid() {
 			} else {
 				tail.push({ x: xPos, y: yPos });
 			}
+
+			// isThereFood();
 		}
-		console.log(grid);
 	};
 
 	useInterval(
 		() => {
 			runSnake();
 			setCount(count + 1);
-			if (xPos === foodCoords.x && yPos === foodCoords.y) {
-				// setSnakeLength((prev) => prev + 1);
-				setHasFood(false);
-				console.log("DING DING");
-				food();
-			}
-
-			// console.log("interval log", "x: ", xPos, "y: ", yPos);
-			// console.log("food log", "x: ", foodCoords?.x, "y: ", foodCoords?.y);
-
-			// console.log("hasfood", hasFood);
 		},
 		isRunning ? delay : null
 	);
-
-	// console.log("yPos", yPos);
-	// console.log("xPos", xPos);
 
 	const handleKeyPress = useCallback((e: KeyboardEvent) => {
 		e.preventDefault();
@@ -207,6 +201,7 @@ function Grid() {
 
 	return (
 		<>
+			{/* {console.log(grid)} */}
 			{isRunning ? <h1>Snake</h1> : gameOver()}
 			<div className={styles.container}>
 				<div
