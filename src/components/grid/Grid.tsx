@@ -47,8 +47,6 @@ function Grid() {
 						gridCopy[foodCoords.y][foodCoords.x] = 2;
 					})
 				);
-				// setXPos(foodCoords.x);
-				// setYPos(foodCoords.y);
 				setHasFood(true);
 			}
 		};
@@ -61,17 +59,13 @@ function Grid() {
 					x: Math.floor(Math.random() * 14) + 1,
 					y: Math.floor(Math.random() * 24) + 1,
 				});
-				// setHasFood(true);
 				console.log("food");
 			};
 			food();
 		}
 
 		isThereFood();
-		if (count > 0) {
-			console.log("grid", grid);
-		}
-	}, [grid, xPos, yPos]);
+	}, [foodCoords.x, foodCoords.y, grid, hasFood, xPos, yPos]);
 
 	const gameOver = () => {
 		return <h1>Game Over</h1>;
@@ -108,8 +102,6 @@ function Grid() {
 							}
 						})
 					);
-					// setYPos
-					// isThereFood();
 					setYPos((prev) => prev - 1);
 					break;
 				case "down":
@@ -121,7 +113,6 @@ function Grid() {
 							}
 						})
 					);
-					// isThereFood();
 					setYPos(yPos + 1);
 					break;
 				case "left":
@@ -133,7 +124,6 @@ function Grid() {
 							}
 						})
 					);
-					// isThereFood();
 					setXPos(xPos - 1);
 					break;
 				case "right":
@@ -145,7 +135,6 @@ function Grid() {
 							}
 						})
 					);
-					// isThereFood();
 					setXPos(xPos + 1);
 					break;
 			}
@@ -157,18 +146,8 @@ function Grid() {
 			} else {
 				tail.push({ x: xPos, y: yPos });
 			}
-
-			// isThereFood();
 		}
 	};
-
-	useInterval(
-		() => {
-			runSnake();
-			setCount(count + 1);
-		},
-		isRunning ? delay : null
-	);
 
 	const handleKeyPress = useCallback((e: KeyboardEvent) => {
 		e.preventDefault();
@@ -194,6 +173,14 @@ function Grid() {
 				console.log("Break");
 		}
 	}, []);
+
+	useInterval(
+		() => {
+			runSnake();
+			setCount(count + 1);
+		},
+		isRunning ? delay : null
+	);
 
 	useEffect(() => {
 		document.addEventListener("keydown", handleKeyPress, true);
