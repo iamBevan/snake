@@ -2,9 +2,9 @@ import React from "react";
 import { Grid } from "./components/grid/Grid";
 import "./main.scss";
 
-function App() {
+function App(): JSX.Element {
 	return (
-		<div className="App">
+		<div className='App'>
 			<Grid />
 		</div>
 	);

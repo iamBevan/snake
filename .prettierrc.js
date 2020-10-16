@@ -1,7 +1,10 @@
 module.exports = {
+	tabWidth: 4,
 	useTabs: true,
-
-	// Default of 80 characters was considered to short
-	// when viewing some of our JSX code in particular.
-	printWidth: 120,
+	printWidth: 80,
+	semi: false,
+	singleQuote: false,
+	jsxSingleQuote: true,
+	bracketSpacing: true,
+	arrowParens: "avoid",
 };
